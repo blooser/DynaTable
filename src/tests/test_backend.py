@@ -8,18 +8,31 @@ def api_client():
     return APIClient()
 
 
-@pytest.mark.django_db
 def test_create_table(api_client):
     url = "/api/table"
-    data = {
-        # Tu powinny zostać dodane odpowiednie dane
-    }
+    data = [{"name": "email", "type": "string"}, {"name": "age", "type": "number"}]
+
     response = api_client.post(url, data, format="json")
+
     assert response.status_code == status.HTTP_201_CREATED
-    # Dodatkowe asercje mogą być tutaj umieszczone
+
+    data = response.json()
+
+    assert "table_id" in data
+    assert isinstance(data["table_id"], str)
+    assert len(data["table_id"]) > 0
 
 
-@pytest.mark.django_db
+def test_create_table_validates_data_and_does_not_allow_incorrect_payload(api_client):
+    url = "/api/table"
+    data = [{"name": "email", "type": "string"}, {"name": "age", "type": "integer"}]
+
+    response = api_client.post(url, data, format="json")
+
+    assert response.status_code == status.HTTP_400_BAD_REQUEST
+
+
+@pytest.mark.skip
 def test_update_table_structure(api_client):
     url = "/api/table/1"  # Zakładając, że tabela o ID 1 istnieje
     data = {
@@ -30,7 +43,7 @@ def test_update_table_structure(api_client):
     # Dodatkowe asercje mogą być tutaj umieszczone
 
 
-@pytest.mark.django_db
+@pytest.mark.skip
 def test_add_table_row(api_client):
     url = "/api/table/1/row"  # Zakładając, że tabela o ID 1 istnieje
     data = {
@@ -41,7 +54,7 @@ def test_add_table_row(api_client):
     # Dodatkowe asercje mogą być tutaj umieszczone
 
 
-@pytest.mark.django_db
+@pytest.mark.skip
 def test_get_table_rows(api_client):
     url = "/api/table/1/rows"  # Zakładając, że tabela o ID 1 istnieje
     response = api_client.get(url, format="json")

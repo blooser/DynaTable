@@ -3,7 +3,8 @@ from rest_framework.response import Response
 from rest_framework import status
 
 from dynatable.logger import get_logger
-
+from dynatablebackend.serializers import ColumnListSerializer
+from dynatablebackend.db import engine, tables
 
 logger = get_logger("dynatablebackend.views")
 
@@ -12,14 +13,34 @@ logger = get_logger("dynatablebackend.views")
 def create_table(request):
     logger.info("Creating table")
 
-    return Response({"message": "Table created."}, status=status.HTTP_201_CREATED)
+    serializer = ColumnListSerializer(data=request.data)
+
+    if not serializer.is_valid():
+        return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+
+    columns = list(serializer.data)
+
+    table_id = tables.create_table(engine, columns)
+
+    if table_id is None:
+        return Response(
+            {"message": "Failed to create table"}, status=status.HTTP_400_BAD_REQUEST
+        )
+    return Response({"table_id": table_id}, status=status.HTTP_201_CREATED)
 
 
 @api_view(["PUT"])
 def update_table_structure(request, id):
     logger.info("Updating table")
 
-    return Response({"message": "Table structure updated."}, status=status.HTTP_200_OK)
+    serializer = ColumnListSerializer(data=request.data)
+
+    if serializer.is_valid():
+        return Response(
+            {"message": "Table structure updated."}, status=status.HTTP_201_CREATED
+        )
+
+    return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
 
 @api_view(["POST"])
