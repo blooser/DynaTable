@@ -22,6 +22,6 @@ from dynatable import views
 
 urlpatterns = [
     path("admin/", admin.site.urls),
-    path("/", views.root),
+    path("status/", views.project_status),
     path("api/", include("dynatablebackend.urls")),
 ]
