@@ -5,9 +5,10 @@ from rest_framework import status
 
 @pytest.fixture
 def api_client():
-    return APIClient()
+    yield APIClient()
 
 
+@pytest.mark.django_db
 def test_create_table(api_client):
     url = "/api/table"
     data = [{"name": "email", "type": "string"}, {"name": "age", "type": "number"}]
@@ -23,6 +24,7 @@ def test_create_table(api_client):
     assert len(data["table_id"]) > 0
 
 
+@pytest.mark.django_db
 def test_create_table_validates_data_and_does_not_allow_incorrect_payload(api_client):
     url = "/api/table"
     data = [{"name": "email", "type": "string"}, {"name": "age", "type": "integer"}]
@@ -33,6 +35,7 @@ def test_create_table_validates_data_and_does_not_allow_incorrect_payload(api_cl
 
 
 @pytest.mark.skip
+@pytest.mark.django_db
 def test_update_table_structure(api_client):
     url = "/api/table/1"  # Zakładając, że tabela o ID 1 istnieje
     data = {
@@ -43,6 +46,7 @@ def test_update_table_structure(api_client):
     # Dodatkowe asercje mogą być tutaj umieszczone
 
 
+@pytest.mark.django_db
 def test_add_table_row(api_client):
     url = "/api/table"
     data = [{"name": "email", "type": "string"}, {"name": "age", "type": "number"}]
@@ -62,6 +66,7 @@ def test_add_table_row(api_client):
     # Dodatkowe asercje mogą być tutaj umieszczone
 
 
+@pytest.mark.django_db
 def test_get_table_rows(api_client):
     url = "/api/table"
     data = [{"name": "email", "type": "string"}, {"name": "age", "type": "number"}]
@@ -85,5 +90,5 @@ def test_get_table_rows(api_client):
 
     data = response.json()
 
-    assert "test@gmail.com" in data["rows"][0]
-    assert 55 in data["rows"][0]
+    assert "test@gmail.com" == data["rows"][0]["email"]
+    assert 55 == data["rows"][0]["age"]

@@ -4,7 +4,7 @@ from rest_framework import status
 
 from dynatable.logger import get_logger
 from dynatablebackend.serializers import ColumnListSerializer
-from dynatablebackend.db import engine, tables
+from dynatablebackend.db import tables
 
 logger = get_logger("dynatablebackend.views")
 
@@ -20,7 +20,7 @@ def create_table(request):
 
     columns = list(serializer.data)
 
-    table_id = tables.create_table(engine, columns)
+    table_id = tables.create_table(columns)
 
     if table_id is None:
         return Response(
@@ -49,7 +49,7 @@ def add_table_row(request, id):
 
     data = request.data
 
-    if not tables.add_table_row(engine, id, data):
+    if not tables.add_table_row(id, data):
         return Response(
             {"message": "Failed to add row to table"},
             status=status.HTTP_400_BAD_REQUEST,
@@ -62,6 +62,8 @@ def add_table_row(request, id):
 def get_table_rows(request, id):
     logger.info("Retrieving table")
 
-    rows = tables.get_table(engine, id)
+    rows = tables.get_table(id)
+
+    print(rows)
 
     return Response({"rows": rows}, status=status.HTTP_200_OK)

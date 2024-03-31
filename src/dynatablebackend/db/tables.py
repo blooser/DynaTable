@@ -1,11 +1,12 @@
-from sqlalchemy import text, Table, Column, MetaData, Integer
-from sqlalchemy.orm import sessionmaker, registry
+from django.db import connection
+
 
 from dynatable.logger import get_logger
 from dynatablebackend.db.util import (
-    str_to_column_type,
-    create_table_class,
-    get_table_class,
+    create_dynamic_model,
+    get_dynamic_model,
+    to_model_types,
+    obj_to_dict,
 )
 
 import shortuuid
@@ -15,74 +16,45 @@ from functools import lru_cache
 logger = get_logger("dynatablebackend.db")
 
 
-def create_table(engine, columns):
+def create_table(columns):
     table_id = shortuuid.uuid()
 
     logger.info(f"Creating new table '{table_id}' with {len(columns)} columns")
 
-    metadata = MetaData()
+    fields = to_model_types(columns)
 
-    column_definitions = [
-        Column(column["name"], str_to_column_type(column["type"])) for column in columns
-    ]
-    column_definitions.append(Column("id", Integer, primary_key=True))
+    dynamic_model = create_dynamic_model(table_id, fields)
 
-    table = Table(table_id, metadata, *column_definitions)
-
-    table_type = create_table_class(table_id)
-    mapper_registry = registry()
-    mapper_registry.map_imperatively(table_type, table)
-
-    table.create(engine)
+    with connection.schema_editor() as schema_editor:
+        schema_editor.create_model(dynamic_model)
 
     return table_id
 
 
-def update_table(engine, table_id, new_columns):
+def update_table(table_id, new_columns):
     logger.info(f"Updating table id={table_id}")
 
     ...
 
 
-def add_table_row(engine, table_id, row):
+def add_table_row(table_id, row):
     logger.info(f"Adding row to table '{table_id}'")
 
-    metadata = MetaData()
+    DynamicModel = get_dynamic_model(table_id)
 
-    table = Table(table_id, metadata, autoload_with=engine)
+    new_record = DynamicModel(**row)
 
-    columns = table.columns.keys()
-
-    if len(columns) - 1 != len(row.keys()):
-        return False
-
-    table_class = get_table_class(table_id)
-
-    if table_class is None:
-        return False
-
-    Session = sessionmaker(bind=engine)
-
-    table_row = table_class(**row)
-
-    with Session() as session:
-        session.add(table_row)
-        session.commit()
+    new_record.save()
 
     return True
 
 
 @lru_cache(maxsize=32)
-def get_table(engine, table_id):
-    logger.info(f"Retrieving table id={table_id}")
+def get_table(table_id):
+    logger.info(f"Retrieving table '{table_id}'")
 
-    # metadata = MetaData()
-    # table = Table(table_id, metadata)
+    DynamicModel = get_dynamic_model(table_id)
 
-    Session = sessionmaker(bind=engine)
+    items = DynamicModel.objects.all()
 
-    with Session() as session:
-        query = text(f'SELECT * FROM "{table_id}"')
-        result = session.execute(query)
-
-        return map(lambda x: tuple(x), list(result.fetchall()))
+    return list(map(lambda x: obj_to_dict(x), items))
