@@ -47,6 +47,14 @@ def update_table_structure(request, id):
 def add_table_row(request, id):
     logger.info("Adding new table row")
 
+    data = request.data
+
+    if not tables.add_table_row(engine, id, data):
+        return Response(
+            {"message": "Failed to add row to table"},
+            status=status.HTTP_400_BAD_REQUEST,
+        )
+
     return Response({"message": "Row added to table."}, status=status.HTTP_201_CREATED)
 
 
@@ -54,4 +62,6 @@ def add_table_row(request, id):
 def get_table_rows(request, id):
     logger.info("Retrieving table")
 
-    return Response({"message": "Rows retrieved."}, status=status.HTTP_200_OK)
+    rows = tables.get_table(engine, id)
+
+    return Response({"rows": rows}, status=status.HTTP_200_OK)

@@ -43,20 +43,47 @@ def test_update_table_structure(api_client):
     # Dodatkowe asercje mogą być tutaj umieszczone
 
 
-@pytest.mark.skip
 def test_add_table_row(api_client):
-    url = "/api/table/1/row"  # Zakładając, że tabela o ID 1 istnieje
-    data = {
-        # Tu powinny zostać dodane odpowiednie dane
-    }
+    url = "/api/table"
+    data = [{"name": "email", "type": "string"}, {"name": "age", "type": "number"}]
+
+    response = api_client.post(url, data, format="json")
+
+    assert response.status_code == status.HTTP_201_CREATED
+
+    data = response.json()
+
+    table_id = data["table_id"]
+
+    url = f"/api/table/{table_id}/row"  # Zakładając, że tabela o ID 1 istnieje
+    data = {"email": "test@gmail.com", "age": 55}
     response = api_client.post(url, data, format="json")
     assert response.status_code == status.HTTP_201_CREATED
     # Dodatkowe asercje mogą być tutaj umieszczone
 
 
-@pytest.mark.skip
 def test_get_table_rows(api_client):
-    url = "/api/table/1/rows"  # Zakładając, że tabela o ID 1 istnieje
+    url = "/api/table"
+    data = [{"name": "email", "type": "string"}, {"name": "age", "type": "number"}]
+
+    response = api_client.post(url, data, format="json")
+
+    assert response.status_code == status.HTTP_201_CREATED
+
+    data = response.json()
+
+    table_id = data["table_id"]
+
+    url = f"/api/table/{table_id}/row"  # Zakładając, że tabela o ID 1 istnieje
+    data = {"email": "test@gmail.com", "age": 55}
+    response = api_client.post(url, data, format="json")
+    assert response.status_code == status.HTTP_201_CREATED
+
+    url = f"/api/table/{table_id}/rows"  # Zakładając, że tabela o ID 1 istnieje
     response = api_client.get(url, format="json")
     assert response.status_code == status.HTTP_200_OK
-    # Dodatkowe asercje mogą być tutaj umieszczone
+
+    data = response.json()
+
+    assert "test@gmail.com" in data["rows"][0]
+    assert 55 in data["rows"][0]
