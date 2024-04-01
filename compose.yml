@@ -18,7 +18,7 @@ services:
     build: .
     command: python src/manage.py runserver 0.0.0.0:8000 
     volumes:
-      - .:/src
+      - .:/app
     ports:
       - "8000:8000"
     depends_on:
@@ -28,7 +28,7 @@ services:
     build: .
     command: poetry run coverage run -m pytest src/
     volumes:
-      - .:/src
+      - .:/app
     depends_on:
       - db
 
@@ -36,7 +36,7 @@ services:
     build: .
     command: poetry run pytest src/
     volumes:
-      - .:/src
+      - .:/app
     depends_on:
       - db
 
