@@ -110,7 +110,50 @@ def test_add_table_row_adds_table_row(fields):
     ],
 )
 def test_update_table_updates_tables_schema(fields):
-    assert True
+    table_id = tables.create_table(fields)
+
+    assert isinstance(table_id, str)
+    assert len(table_id) > 0
+
+    with connection.cursor() as cursor:
+        cursor.execute(
+            """
+            SELECT COLUMN_NAME, DATA_TYPE, IS_NULLABLE
+            FROM INFORMATION_SCHEMA.COLUMNS
+            WHERE TABLE_NAME = %s;
+            """,
+            [table_id],
+        )
+
+        columns = cursor.fetchall()
+
+        def _exists(key, value, fields):
+            for field in fields:
+                if key == field:
+                    assert field[key] == value
+
+        for column in columns:
+            column_name = column[0]
+            column_type = column[1]
+
+            _exists(column_name, column_type, fields)
+
+        new_column = [{"name": "phone", "type": "string"}]
+
+        assert tables.update_table(table_id, new_column)
+
+        cursor.execute(
+            """
+            SELECT COLUMN_NAME, DATA_TYPE, IS_NULLABLE
+            FROM INFORMATION_SCHEMA.COLUMNS
+            WHERE TABLE_NAME = %s;
+            """,
+            [table_id],
+        )
+
+        columns = cursor.fetchall()
+
+        _exists("name", "phone", fields)
 
 
 @pytest.mark.django_db
