@@ -12,7 +12,6 @@ from dynatablebackend.db.util import (
 
 import shortuuid
 
-from functools import lru_cache
 
 logger = get_logger("dynatablebackend.db")
 
@@ -63,7 +62,6 @@ def add_table_row(table_id, row):
     return True
 
 
-@lru_cache(maxsize=32)
 def get_table_rows(table_id):
     logger.info(f"Retrieving table '{table_id}'")
 
