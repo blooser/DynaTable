@@ -24,6 +24,13 @@ services:
     depends_on:
       - db
 
+  coverage:
+    build: .
+    command: poetry run coverage run -m pytest src/
+    volumes:
+      - .:/src
+    depends_on:
+      - db
 
   test:
     build: .
