@@ -15,14 +15,10 @@ FROM base as copy-stage
 
 COPY . /app
 
-# --- Testing Stage ---
-
-FROM testing-stage as testing
-
-CMD ["pytest app/src/"]
-
 # ---- Development Stage ----
 FROM copy-stage as development
+
+EXPOSE 8000
 
 ENV DJANGO_SETTINGS_MODULE=dynatable.settings
 
@@ -30,6 +26,8 @@ CMD ["python", "app/src/manage.py", "runserver", "0.0.0.0:8000"]
 
 # ---- Production Stage ----
 FROM copy-stage as production
+
+EXPOSE 8000
 
 ENV DJANGO_SETTINGS_MODULE=dynatable.settings
 

@@ -13,6 +13,7 @@ pytest-django = "^4.8.0"
 sqlalchemy = "^2.0.29"
 postgres = "^4.0"
 shortuuid = "^1.0.13"
+coverage = "^7.4.4"
 
 
 [build-system]

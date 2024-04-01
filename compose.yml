@@ -24,5 +24,15 @@ services:
     depends_on:
       - db
 
+
+  test:
+    build: .
+    command: poetry run pytest src/
+    volumes:
+      - .:/src
+    depends_on:
+      - db
+
+
 volumes:
   postgres_volume:
