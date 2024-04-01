@@ -17,6 +17,7 @@ def create_table(request):
     serializer = ColumnListSerializer(data=request.data)
 
     if not serializer.is_valid():
+        print(serializer.errors)
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
     columns = list(serializer.data)

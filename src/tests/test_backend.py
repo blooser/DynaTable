@@ -3,17 +3,29 @@ from rest_framework.test import APIClient
 from rest_framework import status
 
 
+from tests.generator import generator
+
+
 @pytest.fixture
 def api_client():
     yield APIClient()
 
 
 @pytest.mark.django_db
-def test_create_table(api_client):
+@pytest.mark.parametrize(
+    "fields",
+    [
+        (generator.model_fields_generator.one()),
+        (generator.model_fields_generator.one()),
+        (generator.model_fields_generator.one()),
+        (generator.model_fields_generator.one()),
+        (generator.model_fields_generator.one()),
+    ],
+)
+def test_create_table(api_client, fields):
     url = "/api/table"
-    data = [{"name": "email", "type": "string"}, {"name": "age", "type": "number"}]
 
-    response = api_client.post(url, data, format="json")
+    response = api_client.post(url, fields, format="json")
 
     assert response.status_code == status.HTTP_201_CREATED
 
@@ -46,13 +58,23 @@ def test_update_table_structure_handle_non_existing_table_id(api_client):
 
 
 @pytest.mark.django_db
+@pytest.mark.parametrize(
+    "fields",
+    [
+        (generator.model_fields_generator.one()),
+        (generator.model_fields_generator.one()),
+        (generator.model_fields_generator.one()),
+        (generator.model_fields_generator.one()),
+        (generator.model_fields_generator.one()),
+        (generator.model_fields_generator.one()),
+    ],
+)
 def test_update_table_structure_does_not_allow_to_update_schema_if_table_contains_rows(
-    api_client,
+    api_client, fields
 ):
     url = "/api/table"
-    data = [{"name": "email", "type": "string"}, {"name": "age", "type": "number"}]
 
-    response = api_client.post(url, data, format="json")
+    response = api_client.post(url, fields, format="json")
 
     assert response.status_code == status.HTTP_201_CREATED
 
@@ -65,12 +87,13 @@ def test_update_table_structure_does_not_allow_to_update_schema_if_table_contain
     table_id = data["table_id"]
 
     url = f"/api/table/{table_id}/row"
-    data = {"email": "test@gmail.com", "age": 55}
-    response = api_client.post(url, data, format="json")
+
+    row = fields.row_generator.one()
+    response = api_client.post(url, row, format="json")
     assert response.status_code == status.HTTP_201_CREATED
 
     url = f"/api/table/{table_id}"
-    data = [{"name": "phone", "type": "string"}]
+    data = generator.model_fields_generator.one()
 
     response = api_client.put(url, data, format="json")
     assert response.status_code == status.HTTP_400_BAD_REQUEST
@@ -101,11 +124,23 @@ def test_update_table_structure_updates_structure(api_client):
 
 
 @pytest.mark.django_db
-def test_update_table_structure_updates_structure_and_allows_to_put_row(api_client):
+@pytest.mark.parametrize(
+    "fields",
+    [
+        (generator.model_fields_generator.one()),
+        (generator.model_fields_generator.one()),
+        (generator.model_fields_generator.one()),
+        (generator.model_fields_generator.one()),
+        (generator.model_fields_generator.one()),
+        (generator.model_fields_generator.one()),
+    ],
+)
+def test_update_table_structure_updates_structure_and_allows_to_put_row(
+    api_client, fields
+):
     url = "/api/table"
-    data = [{"name": "email", "type": "string"}, {"name": "age", "type": "number"}]
 
-    response = api_client.post(url, data, format="json")
+    response = api_client.post(url, fields, format="json")
 
     assert response.status_code == status.HTTP_201_CREATED
 
@@ -123,9 +158,11 @@ def test_update_table_structure_updates_structure_and_allows_to_put_row(api_clie
     response = api_client.put(url, data, format="json")
     assert response.status_code == status.HTTP_201_CREATED
 
+    row = fields.row_generator.one()
+    row["phone"] = "+48123456789"
+
     url = f"/api/table/{table_id}/row"
-    data = {"email": "test@gmail.com", "age": 55, "phone": "+48123456789"}
-    response = api_client.post(url, data, format="json")
+    response = api_client.post(url, row, format="json")
     assert response.status_code == status.HTTP_201_CREATED
 
 
