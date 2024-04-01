@@ -7,6 +7,7 @@ from dynatablebackend.db.util import (
     get_dynamic_model,
     to_model_types,
     obj_to_dict,
+    get_combined_fields,
 )
 
 import shortuuid
@@ -16,9 +17,7 @@ from functools import lru_cache
 logger = get_logger("dynatablebackend.db")
 
 
-def create_table(columns):
-    table_id = shortuuid.uuid()
-
+def create_table(columns, table_id=shortuuid.uuid()):
     logger.info(f"Creating new table '{table_id}' with {len(columns)} columns")
 
     fields = to_model_types(columns)
@@ -31,10 +30,22 @@ def create_table(columns):
     return table_id
 
 
-def update_table(table_id, new_columns):
-    logger.info(f"Updating table id={table_id}")
+def update_table(table_id, columns):
+    logger.info(f"Updating table '{table_id}'")
 
-    ...
+    combined_fields = get_combined_fields(table_id, columns)
+
+    DynamicModel = get_dynamic_model(table_id)
+
+    with connection.schema_editor() as schema_editor:
+        schema_editor.delete_model(DynamicModel)
+
+    NewDynamicModel = create_dynamic_model(table_id, combined_fields)
+
+    with connection.schema_editor() as schema_editor:
+        schema_editor.create_model(NewDynamicModel)
+
+    return table_id
 
 
 def add_table_row(table_id, row):
@@ -44,7 +55,10 @@ def add_table_row(table_id, row):
 
     new_record = DynamicModel(**row)
 
-    new_record.save()
+    try:
+        new_record.save()
+    except Exception:
+        return False
 
     return True
 

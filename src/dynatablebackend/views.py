@@ -5,6 +5,7 @@ from rest_framework import status
 from dynatable.logger import get_logger
 from dynatablebackend.serializers import ColumnListSerializer
 from dynatablebackend.db import tables
+from dynatablebackend.db.util import get_dynamic_model
 
 logger = get_logger("dynatablebackend.views")
 
@@ -35,12 +36,32 @@ def update_table_structure(request, id):
 
     serializer = ColumnListSerializer(data=request.data)
 
-    if serializer.is_valid():
+    if not serializer.is_valid():
+        return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+
+    DynamicModel = get_dynamic_model(id)
+
+    if DynamicModel is None:
         return Response(
-            {"message": "Table structure updated."}, status=status.HTTP_201_CREATED
+            {"message": f"Table with id={id} does not exists"},
+            status=status.HTTP_400_BAD_REQUEST,
         )
 
-    return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+    is_empty = DynamicModel.objects.count() == 0
+
+    if not is_empty:
+        return Response(
+            {"message": f"Table '{id}' contains data, create new model then"},
+            status=status.HTTP_400_BAD_REQUEST,
+        )
+
+    columns = list(serializer.data)
+
+    tables.update_table(id, columns)
+
+    return Response(
+        {"message": "Table structure updated."}, status=status.HTTP_201_CREATED
+    )
 
 
 @api_view(["POST"])
@@ -63,7 +84,5 @@ def get_table_rows(request, id):
     logger.info("Retrieving table")
 
     rows = tables.get_table(id)
-
-    print(rows)
 
     return Response({"rows": rows}, status=status.HTTP_200_OK)
