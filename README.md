@@ -1,8 +1,13 @@
+
 # DynaTable 🚀
 
 ![CI Status](https://github.com/blooser/DynaTable/actions/workflows/docker-image.yml/badge.svg)
 
-DynaTable is an innovative dynamic model builder tailored for Django, equipped with a potent REST API interface. It facilitates the on-the-fly creation, updating, and management of database models 🌟. Crafted meticulously using Django, Django REST Framework, and PostgreSQL, DynaTable stands as an indispensable asset for applications necessitating versatile and dynamic database schema management.
+**DynaTable** is an innovative dynamic model builder tailored for Django, equipped with a potent REST API interface. It facilitates the on-the-fly creation, updating, and management of database models 🌟. Crafted meticulously using Django, Django REST Framework, and PostgreSQL, DynaTable stands as an indispensable asset for applications necessitating versatile and dynamic database schema management.
+
+---
+
+<img  width="400" align="center" src="https://raw.githubusercontent.com/blooser/DynaTable/master/images/logo.webp">
 
 ## Technologies 💻
 - [Python](https://www.python.org/)
@@ -39,6 +44,11 @@ $ docker-compose up -d
 
 DynaTable employs a sophisticated multi-stage building process, encapsulated within Docker for optimal efficiency and performance.
 
+This advanced approach offers several significant benefits:
+-  Reduced Image Size
+- Improved Security
+- Optimized Build Caching
+
 ## Exploring API Documentation with Swagger/Redoc 📚
 
 DynaTable simplifies API documentation exploration by utilizing both Swagger and Redoc.
@@ -56,6 +66,8 @@ http://localhost:8000/swagger
 ```bash
 http://localhost:8000/redoc
 ```
+---
+<img src="https://github.com/blooser/DynaTable/blob/master/images/swagger.png?raw=true" />
 
 ## Unit Testing with Pytest 🧪
 
@@ -64,13 +76,20 @@ The application boasts comprehensive unit test coverage utilizing Pytest.
 Execute unit tests with:
 
 ```bash
-$ $ docker-compose run test
+$ docker-compose run test
+```
+
+Or run bash script
+
+```
+$ ./run_tests.sh
 ```
 
 ## Advanced Data Generation and Testing 🔍
 
-DynaTable rigorously tests its functionalities using Pytest alongside generated data, ensuring maximum effectiveness. The bespoke [generator](https://github.com/blooser/DynaTable/blob/master/src/tests/generator.py) module proficiently produces random model fields and data rows for database population. This ensures diverse testing scenarios and enhances the overall quality and reliability of the functions.
+**DynaTable** rigorously tests its functionalities using Pytest alongside generated data, ensuring maximum effectiveness. The bespoke [generator](https://github.com/blooser/DynaTable/blob/master/src/tests/generator.py) module proficiently produces random model fields and data rows for database population. This ensures diverse testing scenarios and enhances the overall quality and reliability of the functions.
 
 # License
 
 This project is licensed under the MIT License - view the [LICENSE.md](https://github.com/blooser/DynaTable/blob/master/LICENSE.md) file for details.
+
