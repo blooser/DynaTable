@@ -35,7 +35,7 @@ def project_status(request):
             }
     """
 
-    logger.info("Returning project status")
+    logger.debug("Returning project status")
 
     return Response(
         {

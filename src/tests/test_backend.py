@@ -101,6 +101,35 @@ def test_update_table_structure_updates_structure(api_client):
 
 
 @pytest.mark.django_db
+def test_update_table_structure_updates_structure_and_allows_to_put_row(api_client):
+    url = "/api/table"
+    data = [{"name": "email", "type": "string"}, {"name": "age", "type": "number"}]
+
+    response = api_client.post(url, data, format="json")
+
+    assert response.status_code == status.HTTP_201_CREATED
+
+    data = response.json()
+
+    assert "table_id" in data
+    assert isinstance(data["table_id"], str)
+    assert len(data["table_id"]) > 0
+
+    table_id = data["table_id"]
+
+    url = f"/api/table/{table_id}"
+    data = [{"name": "phone", "type": "string"}]
+
+    response = api_client.put(url, data, format="json")
+    assert response.status_code == status.HTTP_201_CREATED
+
+    url = f"/api/table/{table_id}/row"
+    data = {"email": "test@gmail.com", "age": 55, "phone": "+48123456789"}
+    response = api_client.post(url, data, format="json")
+    assert response.status_code == status.HTTP_201_CREATED
+
+
+@pytest.mark.django_db
 def test_add_table_row(api_client):
     url = "/api/table"
     data = [{"name": "email", "type": "string"}, {"name": "age", "type": "number"}]

@@ -64,7 +64,7 @@ def add_table_row(table_id, row):
 
 
 @lru_cache(maxsize=32)
-def get_table(table_id):
+def get_table_rows(table_id):
     logger.info(f"Retrieving table '{table_id}'")
 
     DynamicModel = get_dynamic_model(table_id)

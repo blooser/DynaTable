@@ -32,7 +32,7 @@ def create_table(request):
 
 @api_view(["PUT"])
 def update_table_structure(request, id):
-    logger.info("Updating table")
+    logger.info("Updating table '{id}'")
 
     serializer = ColumnListSerializer(data=request.data)
 
@@ -66,7 +66,7 @@ def update_table_structure(request, id):
 
 @api_view(["POST"])
 def add_table_row(request, id):
-    logger.info("Adding new table row")
+    logger.info("Adding new table row to '{id}'")
 
     data = request.data
 
@@ -81,8 +81,8 @@ def add_table_row(request, id):
 
 @api_view(["GET"])
 def get_table_rows(request, id):
-    logger.info("Retrieving table")
+    logger.info("Retrieving table '{id}'")
 
-    rows = tables.get_table(id)
+    rows = tables.get_table_rows(id)
 
     return Response({"rows": rows}, status=status.HTTP_200_OK)

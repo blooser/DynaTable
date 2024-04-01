@@ -3,23 +3,22 @@ from django.db import models
 dynamic_models = {}
 
 COLUMN_TYPES = {
-    "string": models.CharField(max_length=128),
-    "boolean": models.BooleanField(),
-    "number": models.FloatField(),
+    "string": models.CharField,
+    "boolean": models.BooleanField,
+    "number": models.FloatField,
 }
 
 
-def to_model_types(columns, skip=False):
-    if not skip:
-        model_types = {
-            "__module__": "dynatablebackend",
-            "id": models.AutoField(primary_key=True),
-        }
-    else:
-        model_types = {}
+def to_model_types(columns):
+    model_types = {
+        "__module__": "dynatablebackend",
+        "id": models.AutoField(primary_key=True),
+    }
 
     for column in columns:
-        model_types[column["name"]] = COLUMN_TYPES[column["type"]]
+        model_types[column["name"]] = COLUMN_TYPES[
+            column["type"]
+        ]()  # NOTE: Need this because of binding model problem, ext.
 
     return model_types
 
@@ -44,7 +43,7 @@ def get_combined_fields(table_id, fields):
 
     for field in DynamicModel._meta.get_fields():
         if field.name not in model_types:
-            model_types[field.name] = type(field)
+            model_types[field.name] = type(field)()
 
     return model_types
 
