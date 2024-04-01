@@ -24,7 +24,7 @@ def _table_name(table_id: str):
 def test_create_table_creates_table(fields):
     table_id = tables.create_table(fields)
 
-    assert type(table_id) is str
+    assert isinstance(table_id, str)
     assert len(table_id) > 0
 
     with connection.cursor() as cursor:

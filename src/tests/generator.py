@@ -184,10 +184,16 @@ class ModelFieldsGenerator(Generator):
             GeneratedModelFields: A set of randomly generated model fields, each represented as a dictionary.
         """
         return GeneratedModelFields(
-            [
-                {"name": self.random("field_name"), "type": self.random("field_type")}
-                for _ in range(random.randint(3, 7))
-            ]
+            _remove_duplicates(
+                [
+                    {
+                        "name": self.random("field_name"),
+                        "type": self.random("field_type"),
+                    }
+                    for _ in range(random.randint(3, 7))
+                ],
+                key="name",
+            )
         )
 
 
