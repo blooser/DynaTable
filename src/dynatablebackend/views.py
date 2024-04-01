@@ -8,7 +8,7 @@ from dynatablebackend.db import tables
 from dynatablebackend.db.util import get_dynamic_model
 from dynatablebackend.serializers import ColumnListSerializer
 
-logger = get_logger("dynatablebackend.views")
+logger = get_logger(__name__)
 
 
 @api_view(["POST"])

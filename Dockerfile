@@ -1,6 +1,11 @@
 # ---- Base Stage ----
 FROM python:latest as base
 
+LABEL title="DynaTable"
+LABEL description="Dynamic models for django"
+LABEL version="0.0.1"
+LABEL author="Mateusz Solnica (blooser@protonmail.com)"
+
 ENV PYTHONDONTWRITEBYTECODE 1
 ENV PYTHONUNBUFFERED 1
 

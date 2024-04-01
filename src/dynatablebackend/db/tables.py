@@ -12,7 +12,7 @@ from dynatablebackend.db.util import (
     to_model_types,
 )
 
-logger = get_logger("dynatablebackend.db")
+logger = get_logger(__name__)
 
 
 def create_table(columns: List[Dict[str, str]], table_id: str = shortuuid.uuid()):
