@@ -102,10 +102,6 @@ $ poetry run python src/simulation -t <number_of_tables:[1, 10]> --host <host:ht
 
 ---
 
-![sim1](https://github.com/blooser/DynaTable/blob/master/images/sim1.png?raw=true)
-
----
-
 ![sim2](https://github.com/blooser/DynaTable/blob/master/images/sim2.png?raw=true)
 
 
