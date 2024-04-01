@@ -42,9 +42,9 @@ def create_table(columns: List[Dict[str, str]], table_id: str = shortuuid.uuid()
         f"Starting to create new table '{table_id}' with {len(columns)} columns"
     )
 
-    fields = to_model_types(columns)
+    model_types = to_model_types(columns)
 
-    DynamicModel = create_dynamic_model(table_id, fields)
+    DynamicModel = create_dynamic_model(table_id, model_types)
 
     with connection.schema_editor() as schema_editor:
         schema_editor.create_model(DynamicModel)
