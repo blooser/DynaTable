@@ -1,12 +1,12 @@
-from rest_framework.decorators import api_view
-from rest_framework.response import Response
-from rest_framework import status
-from rest_framework.request import Request
-
 from dynatable.logger import get_logger
-from dynatablebackend.serializers import ColumnListSerializer
+from rest_framework import status
+from rest_framework.decorators import api_view
+from rest_framework.request import Request
+from rest_framework.response import Response
+
 from dynatablebackend.db import tables
 from dynatablebackend.db.util import get_dynamic_model
+from dynatablebackend.serializers import ColumnListSerializer
 
 logger = get_logger("dynatablebackend.views")
 

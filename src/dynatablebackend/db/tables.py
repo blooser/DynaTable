@@ -1,18 +1,16 @@
-from typing import List, Dict, Any
-from django.db import connection
-
-
-from dynatable.logger import get_logger
-from dynatablebackend.db.util import (
-    create_dynamic_model,
-    get_dynamic_model,
-    to_model_types,
-    obj_to_dict,
-    get_combined_fields,
-)
+from typing import Any, Dict, List
 
 import shortuuid
+from django.db import connection
+from dynatable.logger import get_logger
 
+from dynatablebackend.db.util import (
+    create_dynamic_model,
+    get_combined_fields,
+    get_dynamic_model,
+    obj_to_dict,
+    to_model_types,
+)
 
 logger = get_logger("dynatablebackend.db")
 
@@ -46,10 +44,10 @@ def create_table(columns: List[Dict[str, str]], table_id: str = shortuuid.uuid()
 
     fields = to_model_types(columns)
 
-    dynamic_model = create_dynamic_model(table_id, fields)
+    DynamicModel = create_dynamic_model(table_id, fields)
 
     with connection.schema_editor() as schema_editor:
-        schema_editor.create_model(dynamic_model)
+        schema_editor.create_model(DynamicModel)
 
     logger.info(f"Table '{table_id}' successfully created with {len(columns)} columns")
 
@@ -84,10 +82,6 @@ def update_table(table_id: str, columns: List[Dict[str, str]]):
 
     DynamicModel = get_dynamic_model(table_id)
 
-    logger.info(
-        f"Table '{table_id}' successfully updated with {len(columns)} new/updated columns"
-    )
-
     combined_fields = get_combined_fields(table_id, columns)
 
     with connection.schema_editor() as schema_editor:
@@ -96,6 +90,10 @@ def update_table(table_id: str, columns: List[Dict[str, str]]):
         NewDynamicModel = create_dynamic_model(table_id, combined_fields)
 
         schema_editor.create_model(NewDynamicModel)
+
+    logger.info(
+        f"Table '{table_id}' successfully updated with {len(columns)} new/updated columns"
+    )
 
     return table_id
 

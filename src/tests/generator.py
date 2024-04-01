@@ -32,8 +32,8 @@ __author__ = "Mateusz Solnica (blooser@protonmail.com)"
 
 
 import json
-import random
 import pathlib
+import random
 from functools import lru_cache
 
 
