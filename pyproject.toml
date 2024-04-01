@@ -1,8 +1,8 @@
 [tool.poetry]
-name = "dynatable"
+name = "DynaTable"
 version = "0.1.0"
-description = ""
-authors = ["blooser <blooser@protonmail.com>"]
+description = "Dynamic models in django"
+authors = ["Mateusz Solnica <blooser@protonmail.com>"]
 readme = "README.md"
 
 [tool.poetry.dependencies]
