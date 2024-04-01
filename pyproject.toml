@@ -20,6 +20,7 @@ inflection = "^0.5.1"
 coreapi = "^2.3.3"
 drf-yasg = "^1.21.7"
 django-rest-swagger = "^2.2.0"
+requests = "^2.31.0"
 
 [tool.ruff]
 lint.select = ["F", "W", "I001"]

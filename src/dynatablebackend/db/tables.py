@@ -15,7 +15,7 @@ from dynatablebackend.db.util import (
 logger = get_logger(__name__)
 
 
-def create_table(columns: List[Dict[str, str]], table_id: str = shortuuid.uuid()):
+def create_table(columns: List[Dict[str, str]], table_id: str | None = None):
     """
     Creates a new table in the database with the specified columns and table identifier.
 
@@ -41,6 +41,11 @@ def create_table(columns: List[Dict[str, str]], table_id: str = shortuuid.uuid()
     logger.info(
         f"Starting to create new table '{table_id}' with {len(columns)} columns"
     )
+
+    if table_id is None:
+        logger.info("Generating table id")
+
+        table_id = shortuuid.uuid()
 
     model_types = to_model_types(columns)
 
