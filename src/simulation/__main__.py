@@ -7,12 +7,13 @@ from tests.generator import generator
 logger = get_logger(__name__)
 
 
-def _show(data):
+def _show(data, host: str):
     """
     Displays the table ID and its rows in a formatted manner.
 
     Args:
         data (dict): A dictionary containing 'table_id' and 'rows' of a table.
+        host (str): A host URI
     """
     table_id = data["table_id"]
     rows = data["rows"]
@@ -22,7 +23,7 @@ def _show(data):
     for row in rows:
         print(f"  {list(row.values())}")
 
-    print("")
+    print(f"\nCheck API: {host}/api/table/{table_id}/rows")
 
 
 def simulate_table(host: str):
@@ -80,7 +81,7 @@ def main():
 
     for _ in range(args.tables):
         result = simulate_table(args.host)
-        _show(result)
+        _show(result, args.host)
 
 
 if __name__ == "__main__":
