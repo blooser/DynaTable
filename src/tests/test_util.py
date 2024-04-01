@@ -1,3 +1,5 @@
+import random
+
 import pytest
 import shortuuid
 from django.db import models
@@ -86,3 +88,34 @@ def test_get_dynamic_model_returns_none_if_model_not_exists():
     DynamicModel = util.get_dynamic_model(table_id)
 
     assert DynamicModel is None
+
+
+@pytest.mark.parametrize(
+    "fields",
+    [
+        (generator.model_fields_generator.one()),
+        (generator.model_fields_generator.one()),
+        (generator.model_fields_generator.one()),
+        (generator.model_fields_generator.one()),
+        (generator.model_fields_generator.one()),
+        (generator.model_fields_generator.one()),
+    ],
+)
+def test_get_combined_fields_returns_combined_fields(fields):
+    table_id = shortuuid.uuid()
+
+    model_types = util.to_model_types(fields)
+
+    util.create_dynamic_model(table_id, model_types)
+
+    new_fields = [{"name": "phone", "type": "string"}]
+
+    combined_fields = util.get_combined_fields(table_id, new_fields)
+
+    assert (
+        len(combined_fields) == len(fields) + len(new_fields) + 2
+    )  # 2 = __module__ + id
+
+    random_field = random.choice(fields)
+    assert random_field["name"] in combined_fields
+    assert isinstance(combined_fields["phone"], models.CharField)
