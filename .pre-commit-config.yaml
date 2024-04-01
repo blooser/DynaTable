@@ -11,4 +11,4 @@ repos:
     hooks:
       - id: mypy
         types: [python]
-        args: [--strict]
+        args: [--config-file, mypy.ini]

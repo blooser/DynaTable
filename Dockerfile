@@ -2,7 +2,7 @@
 FROM python:latest as base
 
 LABEL title="DynaTable"
-LABEL description="Dynamic models for django"
+LABEL description="DynaTable is an innovative dynamic model builder tailored for Django, equipped with a potent REST API interface."
 LABEL version="0.0.1"
 LABEL author="Mateusz Solnica (blooser@protonmail.com)"
 

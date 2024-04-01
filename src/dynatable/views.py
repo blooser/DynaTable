@@ -1,5 +1,6 @@
 from rest_framework import status
 from rest_framework.decorators import api_view
+from rest_framework.request import Request
 from rest_framework.response import Response
 
 from dynatable.logger import get_logger
@@ -8,7 +9,7 @@ logger = get_logger("dynatable.views")
 
 
 @api_view(["GET"])
-def project_status(request):
+def project_status(request: Request) -> Response:
     """
     API view that returns the status of the project.
 

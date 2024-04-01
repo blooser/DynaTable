@@ -1,7 +1,7 @@
 import logging
 
 
-def get_logger(name):
+def get_logger(name: str) -> logging.Logger:
     """
     Creates and returns a logger with the specified name.
 

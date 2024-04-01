@@ -26,7 +26,7 @@ schema_view = get_schema_view(
     openapi.Info(
         title="DynaTable",
         default_version="0.0.1",
-        description="Dynamic model",
+        description="DynaTable is an innovative dynamic model builder tailored for Django, equipped with a potent REST API interface. It facilitates the on-the-fly creation, updating, and management of database models 🌟. Crafted meticulously using Django, Django REST Framework, and PostgreSQL, DynaTable stands as an indispensable asset for applications necessitating versatile and dynamic database schema management.",
     ),
     public=True,
     permission_classes=(permissions.AllowAny,),
