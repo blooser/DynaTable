@@ -92,10 +92,25 @@ $ ./run_tests.sh
 
 ## Simulation 🌐
 
-The **DynaTable** includes a comprehensive simulation module designed to show interactions with the server.
+The **DynaTable** includes a comprehensive [simulation](https://github.com/blooser/DynaTable/blob/master/src/simulation/__main__.py) module designed to show interactions with the server. 
+
+To invoke simulation, run
+
+```bash
+$ poetry run python src/simulation -t <number_of_tables:[1, 10]> --host <host:http://localhost:8000/>
+```
+
+---
+
+![sim1](https://github.com/blooser/DynaTable/blob/master/images/sim1.png?raw=true)
+
+---
+
+![sim2](https://github.com/blooser/DynaTable/blob/master/images/sim2.png?raw=true)
 
 
 # License
 
 This project is licensed under the MIT License - view the [LICENSE.md](https://github.com/blooser/DynaTable/blob/master/LICENSE.md) file for details.
+
 
