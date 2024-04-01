@@ -2,7 +2,7 @@ from django.db import models
 
 dynamic_models = {}
 
-COLUMN_TYPES = {
+MODEL_TYPES = {
     "string": models.CharField,
     "boolean": models.BooleanField,
     "number": models.FloatField,
@@ -16,7 +16,7 @@ def to_model_types(columns):
     }
 
     for column in columns:
-        model_types[column["name"]] = COLUMN_TYPES[
+        model_types[column["name"]] = MODEL_TYPES[
             column["type"]
         ]()  # NOTE: Need this because of binding model problem, ext.
 
@@ -24,7 +24,7 @@ def to_model_types(columns):
 
 
 def create_dynamic_model(table_id, fields):
-    attrs = {"__module__": "dynatablebackend", **fields}
+    attrs = {"__module__": __name__, **fields}
 
     DynamicModel = type(table_id, (models.Model,), attrs)
 

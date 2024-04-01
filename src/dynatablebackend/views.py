@@ -17,7 +17,6 @@ def create_table(request):
     serializer = ColumnListSerializer(data=request.data)
 
     if not serializer.is_valid():
-        print(serializer.errors)
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
     columns = list(serializer.data)
@@ -32,19 +31,19 @@ def create_table(request):
 
 
 @api_view(["PUT"])
-def update_table_structure(request, id):
-    logger.info("Updating table '{id}'")
+def update_table_structure(request, table_id):
+    logger.info("Updating table '{table_id}'")
 
     serializer = ColumnListSerializer(data=request.data)
 
     if not serializer.is_valid():
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
-    DynamicModel = get_dynamic_model(id)
+    DynamicModel = get_dynamic_model(table_id)
 
     if DynamicModel is None:
         return Response(
-            {"message": f"Table with id={id} does not exists"},
+            {"message": f"Table '{table_id}' does not exists"},
             status=status.HTTP_400_BAD_REQUEST,
         )
 
@@ -52,13 +51,13 @@ def update_table_structure(request, id):
 
     if not is_empty:
         return Response(
-            {"message": f"Table '{id}' contains data, create new model then"},
+            {"message": f"Table '{table_id}' contains data, create new model then"},
             status=status.HTTP_400_BAD_REQUEST,
         )
 
     columns = list(serializer.data)
 
-    tables.update_table(id, columns)
+    tables.update_table(table_id, columns)
 
     return Response(
         {"message": "Table structure updated."}, status=status.HTTP_201_CREATED
@@ -66,12 +65,12 @@ def update_table_structure(request, id):
 
 
 @api_view(["POST"])
-def add_table_row(request, id):
-    logger.info("Adding new table row to '{id}'")
+def add_table_row(request, table_id):
+    logger.info("Adding new table row to '{table_id}'")
 
     data = request.data
 
-    if not tables.add_table_row(id, data):
+    if not tables.add_table_row(table_id, data):
         return Response(
             {"message": "Failed to add row to table"},
             status=status.HTTP_400_BAD_REQUEST,
@@ -81,9 +80,9 @@ def add_table_row(request, id):
 
 
 @api_view(["GET"])
-def get_table_rows(request, id):
-    logger.info("Retrieving table '{id}'")
+def get_table_rows(request, table_id):
+    logger.info("Retrieving table '{table_id}'")
 
-    rows = tables.get_table_rows(id)
+    rows = tables.get_table_rows(table_id)
 
     return Response({"rows": rows}, status=status.HTTP_200_OK)

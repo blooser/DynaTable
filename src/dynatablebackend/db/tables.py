@@ -30,18 +30,17 @@ def create_table(columns, table_id=shortuuid.uuid()):
 
 
 def update_table(table_id, columns):
-    logger.info(f"Updating table '{table_id}'")
-
-    combined_fields = get_combined_fields(table_id, columns)
+    logger.info(f"Updating table '{table_id}' with {len(columns)} columns")
 
     DynamicModel = get_dynamic_model(table_id)
+
+    combined_fields = get_combined_fields(table_id, columns)
 
     with connection.schema_editor() as schema_editor:
         schema_editor.delete_model(DynamicModel)
 
-    NewDynamicModel = create_dynamic_model(table_id, combined_fields)
+        NewDynamicModel = create_dynamic_model(table_id, combined_fields)
 
-    with connection.schema_editor() as schema_editor:
         schema_editor.create_model(NewDynamicModel)
 
     return table_id
@@ -52,10 +51,10 @@ def add_table_row(table_id, row):
 
     DynamicModel = get_dynamic_model(table_id)
 
-    new_record = DynamicModel(**row)
+    new_model_record = DynamicModel(**row)
 
     try:
-        new_record.save()
+        new_model_record.save()
     except Exception:
         return False
 
@@ -63,7 +62,7 @@ def add_table_row(table_id, row):
 
 
 def get_table_rows(table_id):
-    logger.info(f"Retrieving table '{table_id}'")
+    logger.info(f"Reading table '{table_id}'")
 
     DynamicModel = get_dynamic_model(table_id)
 

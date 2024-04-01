@@ -4,19 +4,6 @@ import pathlib
 from functools import lru_cache
 
 
-def merge_dictionaries(dict_list):
-    """
-    Merges a list of dictionaries into a single dictionary.
-
-    Args:
-    dict_list (list): The list of dictionaries to be merged.
-
-    Returns:
-    dict: The merged dictionary.
-    """
-    return dict(pair for d in dict_list for pair in d.items())
-
-
 def _remove_duplicates(dict_list, key):
     """
     Removes duplicates from a list of dictionaries based on a specified key.
