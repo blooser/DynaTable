@@ -100,6 +100,12 @@ To invoke simulation, run
 $ poetry run python src/simulation -t <number_of_tables:[1, 10]> --host <host:http://localhost:8000/>
 ```
 
+Or use script
+
+```bash
+$ ./run_simulation.sh
+```
+
 ---
 
 ![sim2](https://github.com/blooser/DynaTable/blob/master/images/sim2.png?raw=true)
