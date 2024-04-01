@@ -3,12 +3,16 @@ version: '3.8'
 services:
   db:
     image: postgres
+    user: postgres
     volumes:
-      - ./data/db:/var/lib/postgresql/data
+      - postgres_volume:/var/lib/postgresql/dynatable:z
     environment:
-      POSTGRES_DB: yourdbname
-      POSTGRES_USER: youruser
-      POSTGRES_PASSWORD: yourpassword
+      POSTGRES_DB: dynatable
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: postgres
+
+    ports:
+      - "5432:5432"
 
   dynatable:
     build: .
@@ -20,3 +24,5 @@ services:
     depends_on:
       - db
 
+volumes:
+  postgres_volume:
