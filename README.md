@@ -1,4 +1,5 @@
 
+
 # DynaTable 🚀
 
 ![CI Status](https://github.com/blooser/DynaTable/actions/workflows/docker-image.yml/badge.svg)
@@ -88,6 +89,11 @@ $ ./run_tests.sh
 ## Advanced Data Generation and Testing 🔍
 
 **DynaTable** rigorously tests its functionalities using Pytest alongside generated data, ensuring maximum effectiveness. The bespoke [generator](https://github.com/blooser/DynaTable/blob/master/src/tests/generator.py) module proficiently produces random model fields and data rows for database population. This ensures diverse testing scenarios and enhances the overall quality and reliability of the functions.
+
+## Simulation 🌐
+
+The **DynaTable** includes a comprehensive simulation module designed to show interactions with the server.
+
 
 # License
 
