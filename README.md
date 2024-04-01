@@ -16,7 +16,7 @@
 - [Docker](https://www.docker.com/)
 - [Swagger](https://swagger.io/) and [Redoc](https://redoc.ly/)
 - [Pytest](https://docs.pytest.org/en/stable/)
-
+- [Poetry](https://python-poetry.org/)
 
 ## Core Features 🌈
 
