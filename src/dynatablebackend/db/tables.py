@@ -1,7 +1,8 @@
-from typing import Any, Dict, List
+from typing import Any, Dict, List, Optional
 
 import shortuuid
 from django.db import connection
+from django.db.utils import Error as DjangoError
 from dynatable.logger import get_logger
 
 from dynatablebackend.db.util import (
@@ -15,66 +16,69 @@ from dynatablebackend.db.util import (
 logger = get_logger(__name__)
 
 
-def create_table(columns: List[Dict[str, str]], table_id: str | None = None):
+def create_table(
+    columns: List[Dict[str, str]], table_id: Optional[str] = None
+) -> Optional[str]:
     """
-    Creates a new table in the database with the specified columns and table identifier.
+    Creates a new table in the database with the specified columns and a table identifier.
 
-    This function first converts the given column definitions to Django model field types,
-    then dynamically creates a new Django model with these fields. It proceeds to create
-    a corresponding table in the database for this model using Django's schema editor.
-    The function generates a unique table identifier if not provided.
+    This function converts the provided column definitions to Django model field types and
+    dynamically creates a new Django model with these fields. It then creates a corresponding
+    table in the database using Django's schema editor. A unique table identifier is generated
+    if not provided.
 
     Args:
-        columns (list of dict): A list of dictionaries representing columns to create, where
-                                each dictionary contains 'name' (field name) and 'type' (field data type).
-        table_id (str, optional): An optional unique identifier for the table. If not provided,
-                                  a random UUID will be generated.
+        columns (List[Dict[str, str]]): A list of dictionaries representing the columns to be created,
+                                        where each dictionary contains 'name' (field name) and 'type'
+                                        (field data type).
+        table_id (Optional[str]): An optional unique identifier for the table. Defaults to None,
+                                  in which case a random UUID is generated.
 
     Returns:
-        str: The table identifier of the newly created table.
+        Optional[str]: The table identifier of the newly created table. Returns None if table creation fails.
 
     Example:
         columns = [{"name": "title", "type": "string"}, {"name": "author", "type": "string"}]
         table_id = create_table(columns)
-        # Creates a new table with 'title' and 'author' columns, and returns its table_id.
+        # This creates a new table with 'title' and 'author' columns and returns its table_id.
     """
     if table_id is None:
-        logger.info("Generating table id")
-
+        logger.info("Generating a new table ID.")
         table_id = shortuuid.uuid()
 
-    logger.info(
-        f"Starting to create new table '{table_id}' with {len(columns)} columns"
-    )
+    logger.info(f"Creating new table '{table_id}' with {len(columns)} columns.")
 
     model_types = to_model_types(columns)
-
     DynamicModel = create_dynamic_model(table_id, model_types)
 
-    with connection.schema_editor() as schema_editor:
-        schema_editor.create_model(DynamicModel)
+    try:
+        with connection.schema_editor() as schema_editor:
+            schema_editor.create_model(DynamicModel)
+    except DjangoError as err:
+        logger.error(f"Error creating table '{table_id}': {err}")
+        return None
 
-    logger.info(f"Table '{table_id}' successfully created with {len(columns)} columns")
-
+    logger.info(f"Table '{table_id}' successfully created.")
     return table_id
 
 
-def update_table(table_id: str, columns: List[Dict[str, str]]):
+def update_table(table_id: str, columns: List[Dict[str, str]]) -> Optional[str]:
     """
     Updates the schema of a specified table by adding new columns or overriding existing ones.
 
-    This function retrieves an existing dynamic model based on the provided table_id, combines its
-    fields with the new columns specified, deletes the old model's table schema, and then creates a
-    new table schema with the updated fields. It effectively updates the table schema in the database
-    to match the new combined fields configuration.
+    Retrieves an existing dynamic model based on the provided table_id and combines its fields
+    with the new columns specified. It then deletes the old model's table schema and creates
+    a new table schema with the updated fields, effectively updating the table schema in the
+    database to match the new configuration.
 
     Args:
         table_id (str): The identifier of the table to be updated.
-        columns (list of dict): A list of dictionaries representing the columns to update or add.
-                                Each dictionary should contain 'name' (field name) and 'type' (field data type).
+        columns (List[Dict[str, str]]): A list of dictionaries representing the columns to update or add,
+                                        where each dictionary contains 'name' (field name) and
+                                        'type' (field data type).
 
     Returns:
-        str: The table identifier of the updated table.
+        Optional[str]: The table identifier of the updated table. Returns None if the update fails.
 
     Example:
         columns_to_update = [{"name": "bio", "type": "string"}]
@@ -82,24 +86,30 @@ def update_table(table_id: str, columns: List[Dict[str, str]]):
         # Updates the 'UserProfile' table by adding or modifying the 'bio' column.
     """
     logger.info(
-        f"Starting to update table '{table_id}' with {len(columns)} new/updated columns"
+        f"Updating table '{table_id}' with {len(columns)} new or updated columns."
     )
 
     DynamicModel = get_dynamic_model(table_id)
+    if DynamicModel is None:
+        logger.error(f"Table '{table_id}' does not exist.")
+        return None
 
     combined_fields = get_combined_fields(table_id, columns)
 
-    with connection.schema_editor() as schema_editor:
-        schema_editor.delete_model(DynamicModel)
+    try:
+        with connection.schema_editor() as schema_editor:
+            schema_editor.delete_model(DynamicModel)
 
-        NewDynamicModel = create_dynamic_model(table_id, combined_fields)
+            NewDynamicModel = create_dynamic_model(table_id, combined_fields)
+            schema_editor.create_model(NewDynamicModel)
 
-        schema_editor.create_model(NewDynamicModel)
+    except DjangoError as err:
+        logger.error(f"Error updating table '{table_id}': {err}")
+        return None
 
     logger.info(
-        f"Table '{table_id}' successfully updated with {len(columns)} new/updated columns"
+        f"Table '{table_id}' successfully updated with {len(columns)} new or updated columns."
     )
-
     return table_id
 
 
@@ -135,8 +145,8 @@ def add_table_row(table_id: str, row: List[Dict[str, Any]]):
     try:
         new_model_record.save()
         logger.info(f"New row added to table '{table_id}'")
-    except Exception as e:
-        logger.error(f"Failed to add a new row to table '{table_id}': {e}")
+    except DjangoError as err:
+        logger.error(f"Failed to add a new row to table '{table_id}': {err}")
 
         return False
 
