@@ -38,14 +38,14 @@ def create_table(columns: List[Dict[str, str]], table_id: str | None = None):
         table_id = create_table(columns)
         # Creates a new table with 'title' and 'author' columns, and returns its table_id.
     """
-    logger.info(
-        f"Starting to create new table '{table_id}' with {len(columns)} columns"
-    )
-
     if table_id is None:
         logger.info("Generating table id")
 
         table_id = shortuuid.uuid()
+
+    logger.info(
+        f"Starting to create new table '{table_id}' with {len(columns)} columns"
+    )
 
     model_types = to_model_types(columns)
 
